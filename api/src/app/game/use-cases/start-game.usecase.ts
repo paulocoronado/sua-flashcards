@@ -7,6 +7,14 @@ export class StartGameUseCase {
 
   execute(pin: string) {
     const game = this.gameRepo.getOrThrow(pin);
-    return game.nextQuestion();
+    const nextQuestion = game.nextQuestion();
+
+    // Si hay pregunta, la devolvemos
+    if (nextQuestion) {
+      return { status: 'playing', question: nextQuestion };
+    }
+
+    // Si NO hay pregunta, devolvemos el Podio
+    return { status: 'game_over', podium: game.getPodium() };
   }
 }

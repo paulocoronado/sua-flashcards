@@ -9,10 +9,10 @@ export class GameSession {
   public players = new Map<string, Player>();
   public currentQuestionIndex = -1;
   public currentVotes: number[] = [0, 0, 0, 0];
-  
+
   constructor(
     public readonly pin: string,
-    private readonly questions: ServerQuestion[]
+    private readonly questions: ServerQuestion[],
   ) {}
 
   addPlayer(clientId: string, name: string) {
@@ -34,12 +34,15 @@ export class GameSession {
 
   nextQuestion() {
     let nextIndex = this.currentQuestionIndex + 1;
-    if (nextIndex >= this.questions.length) nextIndex = 0; // Loop infinito para demo
+
+    // 👇 CAMBIO: Si se acaban las preguntas, devolvemos null (Fin del juego)
+    if (nextIndex >= this.questions.length) {
+      return null;
+    }
 
     this.currentQuestionIndex = nextIndex;
-    this.currentVotes = [0, 0, 0, 0]; // Resetear votos
+    this.currentVotes = [0, 0, 0, 0];
 
-    // Devolvemos la pregunta "limpia" (sin la respuesta correcta) para el cliente
     const q = this.questions[nextIndex];
     return { id: q.id, text: q.text, options: q.options };
   }
@@ -64,7 +67,7 @@ export class GameSession {
       correct: isCorrect,
       score: player.score,
       pointsEarned,
-      correctAnswerIndex: currentQ.correctAnswerIndex
+      correctAnswerIndex: currentQ.correctAnswerIndex,
     };
   }
 
@@ -72,7 +75,16 @@ export class GameSession {
     const currentQ = this.questions[this.currentQuestionIndex];
     return {
       votes: this.currentVotes,
-      correctOptionIndex: currentQ.correctAnswerIndex
+      correctOptionIndex: currentQ.correctAnswerIndex,
     };
+  }
+
+  getPodium() {
+    // Convertimos el mapa a array y ordenamos por puntaje descendente
+    const sortedPlayers = Array.from(this.players.values())
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3); // Tomamos solo los 3 primeros
+
+    return sortedPlayers;
   }
 }

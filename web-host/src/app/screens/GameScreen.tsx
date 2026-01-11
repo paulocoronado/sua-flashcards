@@ -2,15 +2,17 @@ import React from 'react';
 import { Question } from '@sua-flashcards/shared';
 
 const COLORS = ['#e21b3c', '#1368ce', '#d89e00', '#26890c'];
+const SHAPES = ['▲', '◆', '●', '■'];
 
 interface Props {
   question: Question;
   pin: string;
   answersCount: number;
   totalPlayers: number;
+  onShowResults: () => void; // 👈 ¡Faltaba esto!
 }
 
-export const GameScreen = ({ question, pin, answersCount, totalPlayers }: Props) => {
+export const GameScreen = ({ question, pin, answersCount, totalPlayers, onShowResults }: Props) => {
   return (
     <div style={styles.container}>
       <div style={styles.header}>
@@ -21,14 +23,21 @@ export const GameScreen = ({ question, pin, answersCount, totalPlayers }: Props)
       <div style={styles.grid}>
         {question.options.map((opt, i) => (
           <div key={i} style={{...styles.card, backgroundColor: COLORS[i % 4]}}>
-            <span style={styles.shape}>{['▲', '◆', '●', '■'][i]}</span>
+            <span style={styles.shape}>{SHAPES[i]}</span>
             <span>{opt}</span>
           </div>
         ))}
       </div>
       
       <div style={styles.footer}>
-        <span>PIN: {pin}</span>
+        <div style={{display: 'flex', gap: '20px', alignItems: 'center'}}>
+          <span>PIN: {pin}</span>
+          {/* Botón para terminar la pregunta manualmente */}
+          <button onClick={onShowResults} style={styles.resultBtn}>
+            Ver Resultados 📊
+          </button>
+        </div>
+
         <span style={{fontSize: 24, fontWeight: 'bold'}}>
           Respuestas: {answersCount} / {totalPlayers}
         </span>
@@ -45,5 +54,6 @@ const styles: { [key: string]: React.CSSProperties } = {
   grid: { flex: 1, padding: '20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' },
   card: { display: 'flex', alignItems: 'center', padding: '0 40px', borderRadius: '5px', color: 'white', fontSize: '2rem', fontWeight: 'bold', boxShadow: '0 4px 0 rgba(0,0,0,0.2)' },
   shape: { marginRight: '20px', fontSize: '3rem' },
-  footer: { padding: '10px 20px', backgroundColor: '#333', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '1.2rem' }
+  footer: { padding: '10px 20px', backgroundColor: '#333', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '1.2rem' },
+  resultBtn: { padding: '8px 16px', backgroundColor: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', color: '#333' }
 };
